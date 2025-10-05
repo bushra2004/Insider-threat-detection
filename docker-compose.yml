@@ -1,24 +1,60 @@
-version: '3.8'
-
 services:
-  insider-threat-app:
-    build: .
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.fastapi
     ports:
-      - "8501:8501"  # Streamlit dashboard
-      - "8000:8000"  # FastAPI backend
-      - "8765:8765"  # WebSocket server
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/insiderdb
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
     volumes:
-      - ./data:/app/data
-      - ./models:/app/models
+      - ./backend:/app/backend
+
+  insider-threat-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    ports:
+      - "8501:8501"
     environment:
       - PYTHONPATH=/app
       - JWT_SECRET_KEY=your-production-secret-key
+    depends_on:
+      - backend
+    volumes:
+      - ./dashboard:/app/dashboard
+      - ./data:/app/data
+      - ./models:/app/models
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: insiderdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8501"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.0
@@ -35,16 +71,9 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    restart: unless-stopped
-
 volumes:
+  pg_data:
   redis_data:

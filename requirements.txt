@@ -1,15 +1,25 @@
-pandas==1.5.3
-numpy==1.24.3
+# Core analytics + ML
 scikit-learn==1.2.2
 tensorflow==2.12.0
-elasticsearch==8.8.0
+
+# Visualisation + dashboard
 streamlit==1.23.1
-matplotlib==3.7.1
-seaborn==0.12.2
-jupyter==1.0.0
-pyyaml==6.0
-python-dotenv==1.0.0
-joblib==1.2.0
-tqdm==4.65.0
 plotly==5.14.1
 kaleido==0.2.1
+matplotlib==3.7.1
+seaborn==0.12.2
+
+# Backend + infra
+fastapi==0.95.2
+uvicorn==0.22.0
+psycopg2-binary==2.9.6
+redis==4.5.5
+requests==2.31.0
+python-dotenv==1.0.0
+pyyaml==6.0
+
+# Utilities
+joblib==1.2.0
+tqdm==4.65.0
+elasticsearch==8.8.0
+jupyter==1.0.0

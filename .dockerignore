@@ -1,0 +1,10 @@
+__pycache__
+*.pyc
+.env
+.env.*
+venv/
+.insider-threat-env/
+*.log
+data/
+models/
+*.sqlite

@@ -20,3 +20,5 @@
 "[auth]" 
 "[backend" 
 "[insider-threat-app" 
+venv/
+.DS_Store
